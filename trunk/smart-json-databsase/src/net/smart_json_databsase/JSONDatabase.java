@@ -228,6 +228,12 @@ public class JSONDatabase {
 		return fetchByRawSQL(db,Fetch_BY_TAG_SCRIPTE,new String[]{tag});
 	}
 	
+	public Collection<JSONEntity> fetchByFields(SearchFields search)
+	{
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + search.toString(),new String[]{});
+	}
+	
 	public Collection<JSONEntity> fetchAllEntities()
 	{
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
