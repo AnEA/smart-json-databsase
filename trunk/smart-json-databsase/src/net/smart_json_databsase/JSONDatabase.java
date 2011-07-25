@@ -61,7 +61,7 @@ public class JSONDatabase {
 	" (tag_uid integer primary key autoincrement, name varchar(100));";
 	
 	private static final String JSONDATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_JSON_DATA+
-	" (json_uid integer primary key autoincrement, createDate date, updateDate date, data text);";
+	" (json_uid integer primary key autoincrement, createDate date, updateDate date, type varchar(100) DEFAULT " + JSONEntity.DEFAULT_TYPE + ", data text);";
 	
 	private static final String Rel_TAG_JSONDATA_DB_CREATE_SCRIPTE = "CREATE TABLE IF NOT EXISTS " +TABLE_REL_TAG_JSON_DATA+
 	" (from_id integer, to_id integer);";
@@ -240,6 +240,15 @@ public class JSONDatabase {
 		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA,new String[]{});
 	}
 	
+	public Collection<JSONEntity> fetchByType(String type)
+	{
+		if(Util.IsNullOrEmpty(type))
+			return new ArrayList<JSONEntity>();
+		
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + " WHERE type = '" + type + "'",new String[]{});
+	}
+	
 	public Collection<JSONEntity> fetchManyByIds(Collection<Integer> ids)
 	{
 		if(ids == null)
@@ -290,7 +299,7 @@ public class JSONDatabase {
 			values.put("createDate", Util.DateToString(entity.getCreationDate()));
 			values.put("updateDate", Util.DateToString(entity.getUpdateDate()));
 			values.put("data", entity.getData().toString());
-			
+			values.put("type", entity.getType());
 			int uid = Util.LongToInt(db.insert(TABLE_JSON_DATA, null, values));
 			returnValue = uid;
 			//entity.setUid(uid);
@@ -365,6 +374,7 @@ public class JSONDatabase {
 			ContentValues values = new ContentValues();
 			values.put("data", entity.getData().toString());
 			values.put("updateDate", Util.DateToString(entity.getUpdateDate()));
+			values.put("type", entity.getType());
 			String[] params = new String[]{"" + entity.getUid()};
 			db.update(TABLE_JSON_DATA, values, "json_uid = ?", params);
 			for(String name : entity.getTags().getToAdd())
@@ -480,6 +490,7 @@ public class JSONDatabase {
 			int col_createDate = c.getColumnIndex("createDate");
 			int col_updateDate = c.getColumnIndex("updateDate");
 			int col_data = c.getColumnIndex("data");
+			int col_type = c.getColumnIndex("type");
 			c.moveToFirst();
 			do{
 				try {
@@ -488,6 +499,7 @@ public class JSONDatabase {
 					entity.setCreationDate(Util.ParseDateFromString(c.getString(col_createDate)));
 					entity.setUpdateDate(Util.ParseDateFromString(c.getString(col_updateDate)));
 					entity.setData(new JSONObject(c.getString(col_data)));
+					entity.setType(c.getString(col_type));
 					list.add(entity);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
