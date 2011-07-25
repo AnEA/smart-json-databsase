@@ -26,7 +26,7 @@ public class UpgradeDB implements IUpgrade{
 }
  }}}
 
-Change your DB Version in the configuration and a upgradeClass
+Change your DB Version in the configuration and add a upgradeClass
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
