@@ -1,3 +1,7 @@
+=== 1.2.0 Beta ===
+
+Add Feature: Fetch by many ids
+
 === 1.1.0 Beta ===
 
 Add Feature: Search for Fields
