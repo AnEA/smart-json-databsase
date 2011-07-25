@@ -23,17 +23,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.smart_json_databsase.tools.Util;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONEntity {
 
+	public static final String DEFAULT_TYPE = "jsonEntity";
 	
 	private JSONObject data;
 	private int uid;
 	private Date creationDate;
 	private Date updateDate;
+	private String type;
 	private TagRelation tags;
 	private HashMap<String, HasMany> hasManyRelations;
 	private HashMap<String, BelongsTo> belongsToRelations;
@@ -45,18 +49,32 @@ public class JSONEntity {
 		updateDate = new Date();
 		tags = new TagRelation();
 		data = new JSONObject();
+		type = DEFAULT_TYPE;
+		hasManyRelations = new HashMap<String, HasMany>();
+		belongsToRelations = new HashMap<String, BelongsTo>();
+	}
+	
+	public JSONEntity(String type)
+	{
+		uid = -1;
+		creationDate = new Date();
+		updateDate = new Date();
+		tags = new TagRelation();
+		data = new JSONObject();
+		this.type = type;
 		hasManyRelations = new HashMap<String, HasMany>();
 		belongsToRelations = new HashMap<String, BelongsTo>();
 	}
 	
 	protected JSONEntity(JSONObject data, int uid, Date creationDate,
-			Date updateDate, TagRelation tags) {
+			Date updateDate, TagRelation tags, String type) {
 		super();
 		this.data = data;
 		this.uid = uid;
 		this.creationDate = creationDate;
 		this.updateDate = updateDate;
 		this.tags = tags;
+		this.type = type;
 		hasManyRelations = new HashMap<String, HasMany>();
 		belongsToRelations = new HashMap<String, BelongsTo>();
 	}
@@ -172,6 +190,20 @@ public class JSONEntity {
 
 	protected void setUid(int uid) {
 		this.uid = uid;
+	}
+	
+	
+
+	public String getType() {
+		
+		if(Util.IsNullOrEmpty(type))
+			return DEFAULT_TYPE;
+		
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Date getCreationDate() {
