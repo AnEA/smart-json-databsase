@@ -240,6 +240,35 @@ public class JSONDatabase {
 		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA,new String[]{});
 	}
 	
+	public Collection<JSONEntity> fetchManyByIds(Collection<Integer> ids)
+	{
+		if(ids == null)
+			return new ArrayList<JSONEntity>();
+		
+		if(ids.isEmpty())
+			return new ArrayList<JSONEntity>();
+		
+		
+		String[] whereArgs = new String[ids.size()];
+		StringBuilder builder = new StringBuilder(1000);
+		int counter = 0;
+		builder.append(" WHERE ");
+		for(Integer id : ids)
+		{
+			builder.append("json_uid = ?");
+			whereArgs[counter] = String.valueOf(id);
+			counter++;
+			if(counter < whereArgs.length)
+			{
+				builder.append(" OR ");
+			}
+		}
+		
+		
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		return fetchByRawSQL(db,"SELECT * FROM " + TABLE_JSON_DATA + builder.toString(),whereArgs);
+	}
+	
 	public int store(JSONEntity entity)
 	{
 		if(entity.getUid() == -1)
