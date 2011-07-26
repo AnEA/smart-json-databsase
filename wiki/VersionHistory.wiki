@@ -3,7 +3,7 @@
 Add Feature: Type for Entity
 
 A Entity can now have a type to give it a category.
-You can fetch entites with a type.
+You can fetch entites by a type.
 
 Database structure changed because of that.
 
