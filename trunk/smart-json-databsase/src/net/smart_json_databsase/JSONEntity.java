@@ -318,15 +318,98 @@ public class JSONEntity {
 		JSONObject object = new JSONObject();
 		try {
 			object.put("uid", uid);
+			object.put("type", type);
 			object.put("creationDate", creationDate.getTime());
 			object.put("updateDate", updateDate.getTime());
 			object.put("data", data);
 			object.put("tags", new JSONArray(tags.getAll().toCollection()));
+			
+			ArrayList<JSONObject> relationsArray = new ArrayList<JSONObject>();
+			for(HasMany hasMany : hasManyRelations.values())
+			{
+				JSONObject relObj = new JSONObject();
+				relObj.put("name",hasMany.getName());
+				relObj.put(hasMany.getName(), new JSONArray(hasMany.getAll().toCollection()));
+				relationsArray.add(relObj);
+			}
+			
+			object.put("hasMany", new JSONArray(relationsArray));
+	
+			relationsArray = new ArrayList<JSONObject>();
+			for(BelongsTo belongsTo : belongsToRelations.values())
+			{
+				JSONObject relObj = new JSONObject();
+				relObj.put("name", belongsTo.getName());
+				relObj.put(belongsTo.getName(), new JSONArray(belongsTo.getAll().toCollection()));
+				relationsArray.add(relObj);
+			}
+			
+			object.put("belongsTo", new JSONArray(relationsArray));
+			
 			return object.toString();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			return null;
 		}
+	}
+	
+	public static JSONEntity ParseFromString(String s) throws JSONException
+	{
+		JSONObject object = new JSONObject(s);
+		JSONEntity jsonEntity = new JSONEntity(object.getString("type"));
+		jsonEntity.setUid(object.getInt("uid"));
+		jsonEntity.setCreationDate(new Date(object.getLong("creationDate")));
+		jsonEntity.setUpdateDate(new Date(object.getLong("updateDate")));
+		jsonEntity.setData(new JSONObject(object.getString("data")));
+		if(object.has("tags"))
+		{
+			JSONArray jsonArray = object.getJSONArray("tags");
+			for(int i = 0; i < jsonArray.length(); i++)
+			{
+				jsonEntity.tags.put(jsonArray.getString(i));
+			}
+		}
+		
+		if(object.has("hasMany"))
+		{
+			JSONArray jsonArray = object.getJSONArray("hasMany");
+			for(int i = 0; i < jsonArray.length(); i++)
+			{
+				
+				JSONObject relObj = jsonArray.getJSONObject(i);
+				String name = relObj.getString("name");
+				JSONArray relArray = relObj.getJSONArray(name);
+				if(!jsonEntity.hasManyRelations.containsKey(name))
+				{
+					jsonEntity.hasManyRelations.put(name, new HasMany(name));
+				}
+				for(int j = 0; j < relArray.length(); j++)
+				{
+					jsonEntity.hasManyRelations.get(name).put(relArray.getInt(j));
+				}
+			}
+		}
+		
+		if(object.has("belongsTo"))
+		{
+			JSONArray jsonArray = object.getJSONArray("belongsTo");
+			for(int i = 0; i < jsonArray.length(); i++)
+			{
+				JSONObject relObj = jsonArray.getJSONObject(i);
+				String name = relObj.getString("name");
+				JSONArray relArray = relObj.getJSONArray(name);
+				if(!jsonEntity.belongsToRelations.containsKey(name))
+				{
+					jsonEntity.belongsToRelations.put(name, new BelongsTo(name));
+				}
+				for(int j = 0; j < relArray.length(); j++)
+				{
+					jsonEntity.belongsToRelations.get(name).put(relArray.getInt(j));
+				}
+			}
+		}
+		
+		return jsonEntity;
 	}
 	
 }
