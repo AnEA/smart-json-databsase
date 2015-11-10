@@ -1,0 +1,54 @@
+### 1.4.0 Beta ###
+
+Add Feature: JSONEntity.ParseFromString
+
+Improved: JSONEntity.toString
+
+### 1.3.0 Beta ###
+
+Add Feature: Type for Entity
+
+A Entity can now have a type to give it a category.
+You can fetch entites by a type.
+
+Database structure changed because of that.
+
+If you already use json-database you have to alter the database.
+
+Create a class that implements net.smart\_json\_databsase.IUpgrade
+
+```
+public class UpgradeDB implements IUpgrade{
+
+	@Override
+	public void doUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// TODO Auto-generated method stub
+		if(newVersion > oldVersion)
+		{
+			db.execSQL("ALTER TABLE JsonData ADD type varchar(100) DEFAULT " + JSONEntity.DEFAULT_TYPE);
+		}
+	}
+
+}
+```
+
+Change your DB Version in the configuration and add a upgradeClass
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<JSONDatabaseConfiguration> 
+	<Database name="JSONDatabase.db" version="2" upgradeClass="net.TestAndroidClient.UpgradeDB"></Database>
+</JSONDatabaseConfiguration>
+```
+
+### 1.2.0 Beta ###
+
+Add Feature: Fetch by many ids
+
+### 1.1.0 Beta ###
+
+Add Feature: Search for Fields
+
+### 1.0.0 Beta ###
+
+Init
